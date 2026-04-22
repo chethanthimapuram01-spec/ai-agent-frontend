@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import axios from 'axios'
+import { API_ENDPOINTS } from '../config/api'
 
 function ChatUI() {
   const [messages, setMessages] = useState([
@@ -11,6 +12,16 @@ function ChatUI() {
   ])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const messagesEndRef = useRef(null)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
 
   const handleSend = async () => {
     if (!input.trim()) return
@@ -22,25 +33,37 @@ function ChatUI() {
     }
 
     setMessages(prev => [...prev, userMessage])
+    const currentInput = input
     setInput('')
     setIsLoading(true)
+    setError(null)
 
     try {
-      // Placeholder for API call
-      // const response = await axios.post('/api/chat', { message: input })
+      // Make actual API call to backend
+      const response = await axios.post(API_ENDPOINTS.CHAT, { 
+        message: currentInput 
+      })
       
-      // Simulated response for now
-      setTimeout(() => {
-        const assistantMessage = {
-          id: Date.now() + 1,
-          role: 'assistant',
-          content: 'This is a placeholder response. Connect your backend API to get real responses!'
-        }
-        setMessages(prev => [...prev, assistantMessage])
-        setIsLoading(false)
-      }, 1000)
+      // Add assistant response to messages
+      const assistantMessage = {
+        id: Date.now() + 1,
+        role: 'assistant',
+        content: response.data.response || response.data.message || 'No response from assistant'
+      }
+      setMessages(prev => [...prev, assistantMessage])
     } catch (error) {
       console.error('Error sending message:', error)
+      setError('Failed to get response from the server. Please try again.')
+      
+      // Add error message to chat
+      const errorMessage = {
+        id: Date.now() + 1,
+        role: 'assistant',
+        content: error.response?.data?.error || 
+                 'Sorry, I encountered an error. Please make sure the backend server is running and try again.'
+      }
+      setMessages(prev => [...prev, errorMessage])
+    } finally {
       setIsLoading(false)
     }
   }
@@ -84,10 +107,16 @@ function ChatUI() {
               </div>
             </div>
           )}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Input Area */}
         <div className="border-t border-gray-200 p-4">
+          {error && (
+            <div className="mb-3 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
           <div className="flex space-x-4">
             <textarea
               value={input}
@@ -102,7 +131,7 @@ function ChatUI() {
               disabled={!input.trim() || isLoading}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
             >
-              Send
+              {isLoading ? 'Sending...' : 'Send'}
             </button>
           </div>
         </div>
