@@ -2,6 +2,7 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import ChatUI from './components/ChatUI'
+import FileUpload from './components/FileUpload'
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <main className="container mx-auto px-4 py-6">
         <Routes>
           <Route path="/" element={<ChatUI />} />
+          <Route path="/upload" element={<FileUpload />} />
         </Routes>
       </main>
     </div>
