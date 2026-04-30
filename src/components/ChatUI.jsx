@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import axios from 'axios'
 import { API_ENDPOINTS } from '../config/api'
+import { getSessionId, createNewSession } from '../utils/session'
 
 function ChatUI() {
   const [messages, setMessages] = useState([
@@ -13,7 +14,15 @@ function ChatUI() {
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [sessionId, setSessionId] = useState('')
   const messagesEndRef = useRef(null)
+
+  // Initialize or retrieve session ID on mount
+  useEffect(() => {
+    const currentSessionId = getSessionId()
+    setSessionId(currentSessionId)
+    console.log('Current session ID:', currentSessionId)
+  }, [])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -22,6 +31,20 @@ function ChatUI() {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
+
+  const handleNewChat = () => {
+    const newSessionId = createNewSession()
+    setSessionId(newSessionId)
+    setMessages([
+      {
+        id: Date.now(),
+        role: 'assistant',
+        content: 'Hello! I\'m your AI assistant. How can I help you today?'
+      }
+    ])
+    setError(null)
+    console.log('Started new chat session:', newSessionId)
+  }
 
   const handleSend = async () => {
     if (!input.trim()) return
@@ -39,9 +62,10 @@ function ChatUI() {
     setError(null)
 
     try {
-      // Make actual API call to backend
+      // Make actual API call to backend with session ID
       const response = await axios.post(API_ENDPOINTS.CHAT, { 
-        message: currentInput 
+        message: currentInput,
+        session_id: sessionId
       })
       
       // Add assistant response to messages
@@ -77,6 +101,47 @@ function ChatUI() {
 
   return (
     <div className="max-w-4xl mx-auto">
+      {/* Session Info Bar */}
+      <div className="mb-4 flex items-center justify-between bg-white rounded-lg shadow-md p-4">
+        <div className="flex items-center">
+          <svg
+            className="h-5 w-5 text-blue-500 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+            />
+          </svg>
+          <span className="text-sm text-gray-600">
+            Session: <span className="font-mono text-xs text-gray-800">{sessionId.slice(0, 20)}...</span>
+          </span>
+        </div>
+        <button
+          onClick={handleNewChat}
+          className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors flex items-center"
+        >
+          <svg
+            className="h-4 w-4 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+          New Chat
+        </button>
+      </div>
+
       <div className="bg-white rounded-lg shadow-lg h-[calc(100vh-12rem)] flex flex-col">
         {/* Chat Messages */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">

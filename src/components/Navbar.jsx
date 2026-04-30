@@ -1,7 +1,17 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { createNewSession } from '../utils/session'
 
 function Navbar() {
+  const navigate = useNavigate()
+
+  const handleNewChat = () => {
+    createNewSession()
+    navigate('/')
+    // Reload the page to ensure the new session is picked up
+    window.location.reload()
+  }
+
   return (
     <nav className="bg-white shadow-md">
       <div className="container mx-auto px-4">
@@ -31,7 +41,10 @@ function Navbar() {
             >
               Search Docs
             </Link>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button 
+              onClick={handleNewChat}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
               New Chat
             </button>
           </div>
