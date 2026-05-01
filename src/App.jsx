@@ -4,6 +4,7 @@ import Navbar from './components/Navbar'
 import ChatUI from './components/ChatUI'
 import FileUpload from './components/FileUpload'
 import DocumentQuery from './components/DocumentQuery'
+import ExecutionTrace from './components/ExecutionTrace'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/" element={<ChatUI />} />
           <Route path="/upload" element={<FileUpload />} />
           <Route path="/query" element={<DocumentQuery />} />
+          <Route path="/trace" element={<ExecutionTrace />} />
         </Routes>
       </main>
     </div>

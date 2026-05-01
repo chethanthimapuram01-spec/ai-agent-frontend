@@ -5,6 +5,7 @@ export const API_ENDPOINTS = {
   CHAT: `${API_BASE_URL}/api/chat`,
   UPLOAD: `${API_BASE_URL}/api/upload`,
   QUERY: `${API_BASE_URL}/api/query`,
+  TRACE: `${API_BASE_URL}/api/trace`,
 };
 
 export default API_BASE_URL;
