@@ -25,31 +25,37 @@ function Navbar() {
           <div className="flex items-center space-x-6">
             <Link 
               to="/" 
-              className="text-gray-700 hover:text-blue-600 transition-colors"
+              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+            >
+              Dashboard
+            </Link>
+            <Link 
+              to="/chat" 
+              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
             >
               Chat
             </Link>
             <Link 
               to="/upload" 
-              className="text-gray-700 hover:text-blue-600 transition-colors"
+              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
             >
-              Upload File
+              Upload
             </Link>
             <Link 
               to="/query" 
-              className="text-gray-700 hover:text-blue-600 transition-colors"
+              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
             >
-              Search Docs
+              Search
             </Link>
             <Link 
               to="/trace" 
-              className="text-gray-700 hover:text-blue-600 transition-colors"
+              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
             >
-              Execution Trace
+              Trace
             </Link>
             <button 
               onClick={handleNewChat}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg"
             >
               New Chat
             </button>
