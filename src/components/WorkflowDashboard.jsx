@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import axios from 'axios'
 import { API_ENDPOINTS } from '../config/api'
 import { getSessionId } from '../utils/session'
+import { validateFile, validateInput, getErrorMessage, shouldRetry } from '../utils/errorHandling'
 
 function WorkflowDashboard() {
   // State management
@@ -14,6 +15,8 @@ function WorkflowDashboard() {
   const [uploadStatus, setUploadStatus] = useState(null)
   const [selectedTrace, setSelectedTrace] = useState(null)
   const [error, setError] = useState(null)
+  const [canRetry, setCanRetry] = useState(false)
+  const [lastTask, setLastTask] = useState('')
   const fileInputRef = useRef(null)
 
   // Fetch execution traces
@@ -38,6 +41,14 @@ function WorkflowDashboard() {
     const file = e.target.files[0]
     if (!file) return
 
+    // Validate file
+    const validation = validateFile(file)
+    if (!validation.valid) {
+      setError(validation.error)
+      setUploadStatus('failed')
+      return
+    }
+
     const formData = new FormData()
     formData.append('file', file)
 
@@ -46,7 +57,8 @@ function WorkflowDashboard() {
 
     try {
       const response = await axios.post(API_ENDPOINTS.UPLOAD, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 60000
       })
 
       setUploadedFiles(prev => [...prev, {
@@ -56,28 +68,41 @@ function WorkflowDashboard() {
         status: 'success'
       }])
       setUploadStatus('success')
+      setTimeout(() => setUploadStatus(null), 3000) // Clear status after 3 seconds
     } catch (err) {
       console.error('Upload error:', err)
-      setError('Failed to upload file')
+      const errorMessage = getErrorMessage(err)
+      setError(errorMessage)
       setUploadStatus('failed')
     }
   }
 
   // Execute workflow task
   const handleExecuteTask = async () => {
-    if (!taskInput.trim()) {
+    if (!taskInput || !taskInput.trim()) {
       setError('Please enter a task')
+      return
+    }
+
+    // Validate input
+    const validation = validateInput(taskInput)
+    if (!validation.valid) {
+      setError(validation.error)
       return
     }
 
     setProcessing(true)
     setError(null)
     setResult(null)
+    setCanRetry(false)
+    setLastTask(taskInput)
 
     try {
       const response = await axios.post(API_ENDPOINTS.CHAT, {
         message: taskInput,
         session_id: getSessionId()
+      }, {
+        timeout: 30000
       })
 
       setResult({
@@ -90,7 +115,9 @@ function WorkflowDashboard() {
       await fetchTraces()
     } catch (err) {
       console.error('Execution error:', err)
-      setError(err.response?.data?.error || 'Failed to execute task')
+      const errorMessage = getErrorMessage(err)
+      setError(errorMessage)
+      setCanRetry(shouldRetry(err))
       setResult({
         type: 'error',
         content: 'Task execution failed',
@@ -98,6 +125,13 @@ function WorkflowDashboard() {
       })
     } finally {
       setProcessing(false)
+    }
+  }
+
+  const handleRetry = () => {
+    if (lastTask) {
+      setTaskInput(lastTask)
+      handleExecuteTask()
     }
   }
 
@@ -278,10 +312,10 @@ function WorkflowDashboard() {
                   result?.type === 'success' ? 'bg-green-50 border-green-500' :
                   'bg-gray-50 border-gray-500'
                 }`}>
-                  <div className="flex items-center">
+                  <div className="flex items-start">
                     {processing && (
                       <>
-                        <svg className="animate-spin h-5 w-5 text-blue-600 mr-3" viewBox="0 0 24 24">
+                        <svg className="animate-spin h-5 w-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                         </svg>
@@ -289,16 +323,32 @@ function WorkflowDashboard() {
                       </>
                     )}
                     {error && (
-                      <>
-                        <svg className="h-5 w-5 text-red-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                        </svg>
-                        <span className="font-medium text-red-800">{error}</span>
-                      </>
+                      <div className="flex-1">
+                        <div className="flex items-start">
+                          <svg className="h-5 w-5 text-red-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-red-800 mb-1">Task Failed</h4>
+                            <p className="text-red-700">{error}</p>
+                            {canRetry && lastTask && (
+                              <button
+                                onClick={handleRetry}
+                                className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium flex items-center"
+                              >
+                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                Retry Task
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     )}
                     {result?.type === 'success' && (
                       <>
-                        <svg className="h-5 w-5 text-green-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="h-5 w-5 text-green-600 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                         <span className="font-medium text-green-800">Task completed successfully</span>

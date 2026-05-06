@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import axios from 'axios'
 import { API_ENDPOINTS } from '../config/api'
 import { getSessionId, createNewSession } from '../utils/session'
+import { getErrorMessage, validateInput, shouldRetry } from '../utils/errorHandling'
 
 function ChatUI() {
   const [messages, setMessages] = useState([
@@ -15,6 +16,8 @@ function ChatUI() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [sessionId, setSessionId] = useState('')
+  const [canRetry, setCanRetry] = useState(false)
+  const [lastMessage, setLastMessage] = useState('')
   const messagesEndRef = useRef(null)
 
   // Initialize or retrieve session ID on mount
@@ -46,26 +49,43 @@ function ChatUI() {
     console.log('Started new chat session:', newSessionId)
   }
 
-  const handleSend = async () => {
-    if (!input.trim()) return
+  const handleSend = async (messageToSend = null) => {
+    const currentInput = messageToSend || input
+    
+    if (!currentInput || !currentInput.trim()) {
+      setError('Please enter a message')
+      return
+    }
+
+    // Validate input
+    const validation = validateInput(currentInput)
+    if (!validation.valid) {
+      setError(validation.error)
+      return
+    }
 
     const userMessage = {
       id: Date.now(),
       role: 'user',
-      content: input
+      content: currentInput
     }
 
     setMessages(prev => [...prev, userMessage])
-    const currentInput = input
-    setInput('')
+    if (!messageToSend) {
+      setInput('')
+    }
+    setLastMessage(currentInput)
     setIsLoading(true)
     setError(null)
+    setCanRetry(false)
 
     try {
       // Make actual API call to backend with session ID
       const response = await axios.post(API_ENDPOINTS.CHAT, { 
         message: currentInput,
         session_id: sessionId
+      }, {
+        timeout: 30000 // 30 second timeout
       })
       
       // Add assistant response to messages
@@ -77,18 +97,25 @@ function ChatUI() {
       setMessages(prev => [...prev, assistantMessage])
     } catch (error) {
       console.error('Error sending message:', error)
-      setError('Failed to get response from the server. Please try again.')
+      const errorMessage = getErrorMessage(error)
+      setError(errorMessage)
+      setCanRetry(shouldRetry(error))
       
       // Add error message to chat
-      const errorMessage = {
+      const errorChatMessage = {
         id: Date.now() + 1,
         role: 'assistant',
-        content: error.response?.data?.error || 
-                 'Sorry, I encountered an error. Please make sure the backend server is running and try again.'
+        content: `⚠️ ${errorMessage}`
       }
-      setMessages(prev => [...prev, errorMessage])
+      setMessages(prev => [...prev, errorChatMessage])
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleRetry = () => {
+    if (lastMessage) {
+      handleSend(lastMessage)
     }
   }
 
@@ -206,11 +233,27 @@ function ChatUI() {
         {/* Input Area */}
         <div className="border-t border-gray-200 p-4 bg-gray-50">
           {error && (
-            <div className="mb-3 p-3 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg text-sm flex items-center">
-              <svg className="h-5 w-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
-              {error}
+            <div className="mb-3 p-3 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg text-sm">
+              <div className="flex items-start">
+                <svg className="h-5 w-5 text-red-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                <div className="flex-1">
+                  <p className="font-semibold">Error</p>
+                  <p>{error}</p>
+                  {canRetry && lastMessage && (
+                    <button
+                      onClick={handleRetry}
+                      className="mt-2 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs font-medium flex items-center"
+                    >
+                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      Retry
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           )}
           <div className="flex space-x-3">

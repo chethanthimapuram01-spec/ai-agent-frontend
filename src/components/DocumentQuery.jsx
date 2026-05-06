@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 import { API_ENDPOINTS } from '../config/api'
+import { getErrorMessage, validateInput, shouldRetry } from '../utils/errorHandling'
 
 function DocumentQuery() {
   const [query, setQuery] = useState('')
@@ -8,20 +9,35 @@ function DocumentQuery() {
   const [results, setResults] = useState([])
   const [error, setError] = useState(null)
   const [hasSearched, setHasSearched] = useState(false)
+  const [canRetry, setCanRetry] = useState(false)
+  const [lastQuery, setLastQuery] = useState('')
 
-  const handleSearch = async () => {
-    if (!query.trim()) {
+  const handleSearch = async (queryToSearch = null) => {
+    const currentQuery = queryToSearch || query
+    
+    if (!currentQuery || !currentQuery.trim()) {
       setError('Please enter a question')
+      return
+    }
+
+    // Validate query
+    const validation = validateInput(currentQuery)
+    if (!validation.valid) {
+      setError(validation.error)
       return
     }
 
     setSearching(true)
     setError(null)
     setHasSearched(true)
+    setCanRetry(false)
+    setLastQuery(currentQuery)
 
     try {
       const response = await axios.post(API_ENDPOINTS.QUERY, {
-        query: query.trim()
+        query: currentQuery.trim()
+      }, {
+        timeout: 30000 // 30 second timeout
       })
 
       // Handle response - adjust based on your backend structure
@@ -34,10 +50,18 @@ function DocumentQuery() {
       }
     } catch (err) {
       console.error('Query error:', err)
-      setError(err.response?.data?.error || 'Failed to search documents. Please try again.')
+      const errorMessage = getErrorMessage(err)
+      setError(errorMessage)
       setResults([])
+      setCanRetry(shouldRetry(err))
     } finally {
       setSearching(false)
+    }
+  }
+
+  const handleRetry = () => {
+    if (lastQuery) {
+      handleSearch(lastQuery)
     }
   }
 
@@ -103,10 +127,10 @@ function DocumentQuery() {
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <div className="flex">
+          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
+            <div className="flex items-start">
               <svg
-                className="h-5 w-5 text-red-400 mr-2"
+                className="h-5 w-5 text-red-500 mr-3 flex-shrink-0 mt-0.5"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -116,7 +140,21 @@ function DocumentQuery() {
                   clipRule="evenodd"
                 />
               </svg>
-              <p className="text-sm text-red-800">{error}</p>
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold text-red-800 mb-1">Search Failed</h4>
+                <p className="text-sm text-red-700">{error}</p>
+                {canRetry && lastQuery && (
+                  <button
+                    onClick={handleRetry}
+                    className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium flex items-center"
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Retry Search
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         )}

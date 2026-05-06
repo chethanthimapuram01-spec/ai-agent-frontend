@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react'
 import axios from 'axios'
 import { API_ENDPOINTS } from '../config/api'
+import { validateFile, getErrorMessage, shouldRetry } from '../utils/errorHandling'
 
 function FileUpload() {
   const [selectedFile, setSelectedFile] = useState(null)
@@ -9,22 +10,40 @@ function FileUpload() {
   const [extractedText, setExtractedText] = useState('')
   const [error, setError] = useState(null)
   const [uploadedFileName, setUploadedFileName] = useState('')
+  const [retryCount, setRetryCount] = useState(0)
+  const [canRetry, setCanRetry] = useState(false)
   const fileInputRef = useRef(null)
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0]
     if (file) {
+      // Validate file
+      const validation = validateFile(file)
+      if (!validation.valid) {
+        setError(validation.error)
+        setSelectedFile(null)
+        return
+      }
+
       setSelectedFile(file)
       setUploadSuccess(false)
       setError(null)
       setExtractedText('')
       setUploadedFileName('')
+      setCanRetry(false)
     }
   }
 
-  const handleUpload = async () => {
+  const handleUpload = async (isRetry = false) => {
     if (!selectedFile) {
       setError('Please select a file first')
+      return
+    }
+
+    // Validate again before upload
+    const validation = validateFile(selectedFile)
+    if (!validation.valid) {
+      setError(validation.error)
       return
     }
 
@@ -34,17 +53,20 @@ function FileUpload() {
     setUploading(true)
     setError(null)
     setUploadSuccess(false)
+    setCanRetry(false)
 
     try {
       const response = await axios.post(API_ENDPOINTS.UPLOAD, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+        timeout: 60000, // 60 second timeout
       })
 
       // Handle successful upload
       setUploadSuccess(true)
       setUploadedFileName(selectedFile.name)
+      setRetryCount(0)
       
       // Extract text from response (adjust based on your backend response structure)
       if (response.data.text || response.data.extractedText) {
@@ -58,10 +80,28 @@ function FileUpload() {
       }
     } catch (err) {
       console.error('Upload error:', err)
-      setError(err.response?.data?.error || 'Failed to upload file. Please try again.')
+      const errorMessage = getErrorMessage(err)
+      setError(errorMessage)
       setUploadSuccess(false)
+      
+      // Determine if retry is possible
+      const retry = shouldRetry(err)
+      setCanRetry(retry)
+      
+      if (isRetry) {
+        setRetryCount(prev => prev + 1)
+      }
     } finally {
       setUploading(false)
+    }
+  }
+
+  const handleRetry = () => {
+    if (retryCount < 3) { // Max 3 retries
+      handleUpload(true)
+    } else {
+      setError('Maximum retry attempts reached. Please check your file and try again later.')
+      setCanRetry(false)
     }
   }
 
@@ -206,10 +246,10 @@ function FileUpload() {
 
         {/* Error Message */}
         {error && (
-          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <div className="flex">
+          <div className="mt-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
+            <div className="flex items-start">
               <svg
-                className="h-5 w-5 text-red-400 mr-2"
+                className="h-5 w-5 text-red-500 mr-3 flex-shrink-0 mt-0.5"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -219,7 +259,35 @@ function FileUpload() {
                   clipRule="evenodd"
                 />
               </svg>
-              <p className="text-sm text-red-800">{error}</p>
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold text-red-800 mb-1">Upload Failed</h4>
+                <p className="text-sm text-red-700">{error}</p>
+                {retryCount > 0 && retryCount < 3 && (
+                  <p className="text-xs text-red-600 mt-1">Retry attempt {retryCount} of 3</p>
+                )}
+                {canRetry && retryCount < 3 && (
+                  <button
+                    onClick={handleRetry}
+                    className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium flex items-center"
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Retry Upload
+                  </button>
+                )}
+                {retryCount >= 3 && (
+                  <div className="mt-3 p-3 bg-red-100 rounded border border-red-300">
+                    <p className="text-xs text-red-800">
+                      <strong>Troubleshooting tips:</strong><br/>
+                      • Check your internet connection<br/>
+                      • Ensure the file is not corrupted<br/>
+                      • Try a smaller file<br/>
+                      • Contact support if the issue persists
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
