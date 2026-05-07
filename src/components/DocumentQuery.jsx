@@ -11,6 +11,7 @@ function DocumentQuery() {
   const [hasSearched, setHasSearched] = useState(false)
   const [canRetry, setCanRetry] = useState(false)
   const [lastQuery, setLastQuery] = useState('')
+  const [retryCount, setRetryCount] = useState(0)
 
   const handleSearch = async (queryToSearch = null) => {
     const currentQuery = queryToSearch || query
@@ -48,6 +49,8 @@ function DocumentQuery() {
       } else {
         setResults([])
       }
+      // Reset retry count on success
+      setRetryCount(0)
     } catch (err) {
       console.error('Query error:', err)
       const errorMessage = getErrorMessage(err)
@@ -60,8 +63,12 @@ function DocumentQuery() {
   }
 
   const handleRetry = () => {
-    if (lastQuery) {
+    if (lastQuery && retryCount < 3) {
+      setRetryCount(prev => prev + 1)
       handleSearch(lastQuery)
+    } else if (retryCount >= 3) {
+      setError('Maximum retry attempts reached. Please try again later.')
+      setCanRetry(false)
     }
   }
 
@@ -143,7 +150,10 @@ function DocumentQuery() {
               <div className="flex-1">
                 <h4 className="text-sm font-semibold text-red-800 mb-1">Search Failed</h4>
                 <p className="text-sm text-red-700">{error}</p>
-                {canRetry && lastQuery && (
+                {retryCount > 0 && retryCount < 3 && (
+                  <p className="text-xs text-red-600 mt-1">Retry attempt {retryCount} of 3</p>
+                )}
+                {canRetry && lastQuery && retryCount < 3 && (
                   <button
                     onClick={handleRetry}
                     className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium flex items-center"
@@ -153,6 +163,13 @@ function DocumentQuery() {
                     </svg>
                     Retry Search
                   </button>
+                )}
+                {retryCount >= 3 && (
+                  <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-sm text-yellow-800">
+                      ⚠️ Maximum retry attempts reached. Please try again later or contact support if the problem persists.
+                    </p>
+                  </div>
                 )}
               </div>
             </div>

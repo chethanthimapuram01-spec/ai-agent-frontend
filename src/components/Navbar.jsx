@@ -7,7 +7,7 @@ function Navbar() {
 
   const handleNewChat = () => {
     createNewSession()
-    navigate('/')
+    navigate('/chat')
     // Reload the page to ensure the new session is picked up
     window.location.reload()
   }

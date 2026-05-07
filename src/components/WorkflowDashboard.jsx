@@ -17,6 +17,7 @@ function WorkflowDashboard() {
   const [error, setError] = useState(null)
   const [canRetry, setCanRetry] = useState(false)
   const [lastTask, setLastTask] = useState('')
+  const [uploadRetryCount, setUploadRetryCount] = useState(0)
   const fileInputRef = useRef(null)
 
   // Fetch execution traces
@@ -68,6 +69,7 @@ function WorkflowDashboard() {
         status: 'success'
       }])
       setUploadStatus('success')
+      setUploadRetryCount(0)
       setTimeout(() => setUploadStatus(null), 3000) // Clear status after 3 seconds
     } catch (err) {
       console.error('Upload error:', err)
@@ -142,6 +144,28 @@ function WorkflowDashboard() {
     if (statusLower === 'failure' || statusLower === 'failed') return 'red'
     if (statusLower === 'running') return 'blue'
     return 'gray'
+  }
+
+  const getStatusClasses = (color) => {
+    const classMap = {
+      green: {
+        badge: 'bg-green-100 text-green-600',
+        circle: 'bg-green-100 text-green-600'
+      },
+      red: {
+        badge: 'bg-red-100 text-red-600',
+        circle: 'bg-red-100 text-red-600'
+      },
+      blue: {
+        badge: 'bg-blue-100 text-blue-600',
+        circle: 'bg-blue-100 text-blue-600'
+      },
+      gray: {
+        badge: 'bg-gray-100 text-gray-600',
+        circle: 'bg-gray-100 text-gray-600'
+      }
+    }
+    return classMap[color] || classMap.gray
   }
 
   return (
@@ -375,17 +399,18 @@ function WorkflowDashboard() {
                   ) : (
                     executionTraces.slice(0, 5).map((trace, index) => {
                       const color = getStatusColor(trace.status || trace.success)
+                      const classes = getStatusClasses(color)
                       return (
                         <div key={index} className="flex items-center p-3 bg-white rounded-lg border border-purple-200 hover:border-purple-400 transition-all cursor-pointer"
                           onClick={() => setSelectedTrace(selectedTrace === index ? null : index)}>
-                          <div className={`w-8 h-8 rounded-full bg-${color}-100 text-${color}-600 flex items-center justify-center font-bold text-sm mr-3 flex-shrink-0`}>
+                          <div className={`w-8 h-8 rounded-full ${classes.circle} flex items-center justify-center font-bold text-sm mr-3 flex-shrink-0`}>
                             {trace.step || index + 1}
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-gray-900 truncate">{trace.tool || trace.action || 'Step'}</p>
                             <p className="text-xs text-gray-500 truncate">{trace.description || trace.result || ''}</p>
                           </div>
-                          <span className={`ml-2 px-2 py-1 rounded-full text-xs font-semibold bg-${color}-100 text-${color}-600`}>
+                          <span className={`ml-2 px-2 py-1 rounded-full text-xs font-semibold ${classes.badge}`}>
                             {typeof trace.status === 'boolean' ? (trace.status ? '✓' : '✗') : String(trace.status || '•')}
                           </span>
                         </div>
@@ -487,18 +512,19 @@ function WorkflowDashboard() {
               ) : (
                 executionTraces.map((trace, index) => {
                   const color = getStatusColor(trace.status || trace.success)
+                  const classes = getStatusClasses(color)
                   return (
                     <div key={index} className="border border-gray-200 rounded-lg hover:border-blue-300 transition-all cursor-pointer"
                       onClick={() => setSelectedTrace(selectedTrace === index ? null : index)}>
                       <div className="flex items-center p-4 bg-gray-50">
-                        <div className={`w-12 h-12 rounded-full bg-${color}-100 text-${color}-600 flex items-center justify-center font-bold text-lg mr-4`}>
+                        <div className={`w-12 h-12 rounded-full ${classes.circle} flex items-center justify-center font-bold text-lg mr-4`}>
                           {trace.step || index + 1}
                         </div>
                         <div className="flex-1">
                           <h3 className="font-semibold text-gray-900">{trace.tool || trace.action || 'Unknown Tool'}</h3>
                           {trace.description && <p className="text-sm text-gray-600 mt-1">{trace.description}</p>}
                         </div>
-                        <span className={`px-4 py-2 rounded-full font-semibold text-sm bg-${color}-100 text-${color}-600`}>
+                        <span className={`px-4 py-2 rounded-full font-semibold text-sm ${classes.badge}`}>
                           {typeof trace.status === 'boolean' ? (trace.status ? 'Success' : 'Failed') : String(trace.status || 'Unknown')}
                         </span>
                         <svg className={`ml-4 h-5 w-5 text-gray-400 transition-transform ${selectedTrace === index ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">

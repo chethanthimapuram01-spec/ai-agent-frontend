@@ -116,11 +116,22 @@ function FileUpload() {
     
     const files = e.dataTransfer.files
     if (files && files.length > 0) {
-      setSelectedFile(files[0])
+      const file = files[0]
+      
+      // Validate file
+      const validation = validateFile(file)
+      if (!validation.valid) {
+        setError(validation.error)
+        setSelectedFile(null)
+        return
+      }
+      
+      setSelectedFile(file)
       setUploadSuccess(false)
       setError(null)
       setExtractedText('')
       setUploadedFileName('')
+      setCanRetry(false)
     }
   }
 
