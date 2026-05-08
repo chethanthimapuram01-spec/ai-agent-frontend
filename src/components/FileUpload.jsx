@@ -137,18 +137,18 @@ function FileUpload() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">File Upload</h2>
+      <div className="bg-white rounded-lg shadow-lg p-2">
+        <h2 className="text-base font-bold mb-2 text-gray-800">File Upload</h2>
         
         {/* Drop Zone */}
         <div
           onDragOver={handleDragOver}
           onDrop={handleDrop}
-          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors cursor-pointer"
+          className="border-2 border-dashed border-gray-300 rounded p-2 text-center hover:border-blue-500 transition-colors cursor-pointer"
           onClick={() => fileInputRef.current?.click()}
         >
           <svg
-            className="mx-auto h-12 w-12 text-gray-400"
+            className="mx-auto h-8 w-8 text-gray-400"
             stroke="currentColor"
             fill="none"
             viewBox="0 0 48 48"
@@ -178,10 +178,10 @@ function FileUpload() {
 
         {/* Selected File Display */}
         {selectedFile && (
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg flex items-center justify-between">
+          <div className="mt-1.5 p-1.5 bg-gray-50 rounded flex items-center justify-between">
             <div className="flex items-center">
               <svg
-                className="h-8 w-8 text-blue-500 mr-3"
+                className="h-3 w-3 text-blue-500 mr-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -210,7 +210,7 @@ function FileUpload() {
               }}
               className="text-red-500 hover:text-red-700"
             >
-              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="h-2 w-2" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
                   d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -225,12 +225,12 @@ function FileUpload() {
         <button
           onClick={handleUpload}
           disabled={!selectedFile || uploading}
-          className="mt-4 w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium"
+          className="mt-1.5 w-full px-3 py-1 text-[10px] bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium"
         >
           {uploading ? (
             <span className="flex items-center justify-center">
               <svg
-                className="animate-spin h-5 w-5 mr-3"
+                className="animate-spin h-2 w-2 mr-2"
                 viewBox="0 0 24 24"
               >
                 <circle
@@ -260,7 +260,7 @@ function FileUpload() {
           <div className="mt-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
             <div className="flex items-start">
               <svg
-                className="h-5 w-5 text-red-500 mr-3 flex-shrink-0 mt-0.5"
+                className="h-2 w-2 text-red-500 mr-2 flex-shrink-0 mt-0.5"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -281,7 +281,7 @@ function FileUpload() {
                     onClick={handleRetry}
                     className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium flex items-center"
                   >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-2 h-2 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                     Retry Upload
@@ -308,7 +308,7 @@ function FileUpload() {
           <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
             <div className="flex">
               <svg
-                className="h-5 w-5 text-green-400 mr-2"
+                className="h-2 w-2 text-green-400 mr-1"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >

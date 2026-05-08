@@ -13,49 +13,49 @@ function Navbar() {
   }
 
   return (
-    <nav className="bg-white shadow-md">
+    <nav className="bg-white shadow-sm border-b border-gray-200">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="text-2xl font-bold text-blue-600">
+        <div className="flex items-center justify-between h-10">
+          <Link to="/" className="flex items-center space-x-1.5">
+            <div className="text-sm font-bold text-blue-600">
               🤖 AI Agent
             </div>
           </Link>
           
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-4">
             <Link 
               to="/" 
-              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+              className="text-xs text-gray-600 hover:text-blue-600 transition-colors font-medium"
             >
               Dashboard
             </Link>
             <Link 
               to="/chat" 
-              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+              className="text-xs text-gray-600 hover:text-blue-600 transition-colors font-medium"
             >
               Chat
             </Link>
             <Link 
               to="/upload" 
-              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+              className="text-xs text-gray-600 hover:text-blue-600 transition-colors font-medium"
             >
               Upload
             </Link>
             <Link 
               to="/query" 
-              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+              className="text-xs text-gray-600 hover:text-blue-600 transition-colors font-medium"
             >
               Search
             </Link>
             <Link 
               to="/trace" 
-              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+              className="text-xs text-gray-600 hover:text-blue-600 transition-colors font-medium"
             >
               Trace
             </Link>
             <button 
               onClick={handleNewChat}
-              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg"
+              className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-all shadow-sm"
             >
               New Chat
             </button>

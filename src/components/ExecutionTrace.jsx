@@ -73,27 +73,27 @@ function ExecutionTrace() {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <div className="bg-white rounded-lg shadow-lg p-2">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-2">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Execution Trace</h2>
-            <p className="text-sm text-gray-600 mt-1">Step-by-step execution history</p>
+            <h2 className="text-base font-bold text-gray-800">Execution Trace</h2>
+            <p className="text-[10px] text-gray-600 mt-0.5">Step-by-step execution history</p>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-1.5">
             <label className="flex items-center cursor-pointer">
               <input
                 type="checkbox"
                 checked={autoRefresh}
                 onChange={(e) => setAutoRefresh(e.target.checked)}
-                className="mr-2"
+                className="mr-0.5"
               />
-              <span className="text-sm text-gray-700">Auto-refresh</span>
+              <span className="text-[10px] text-gray-700">Auto-refresh</span>
             </label>
             <button
               onClick={fetchTraces}
               disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 transition-colors flex items-center"
+              className="px-2 py-0.5 text-[10px] bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300 transition-colors flex items-center"
             >
               <svg
                 className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`}
@@ -118,7 +118,7 @@ function ExecutionTrace() {
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex">
               <svg
-                className="h-5 w-5 text-red-400 mr-2"
+                className="h-3 w-3 text-red-400 mr-2"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -136,13 +136,13 @@ function ExecutionTrace() {
         {/* Execution Steps */}
         {loading && traces.length === 0 ? (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+            <div className="inline-block animate-spin h-5 w-5 border-4 border-blue-500 border-t-transparent rounded-full"></div>
             <p className="mt-4 text-gray-600">Loading execution traces...</p>
           </div>
         ) : traces.length === 0 ? (
           <div className="text-center py-12">
             <svg
-              className="mx-auto h-12 w-12 text-gray-400"
+              className="mx-auto h-8 w-8 text-gray-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -168,7 +168,7 @@ function ExecutionTrace() {
                 {/* Step Header */}
                 <div className="flex items-center p-4 bg-gray-50">
                   {/* Step Number */}
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg mr-4">
+                  <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-base mr-4">
                     {trace.step || trace.step_number || index + 1}
                   </div>
 
@@ -176,7 +176,7 @@ function ExecutionTrace() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center">
                       <svg
-                        className="h-5 w-5 text-gray-600 mr-2 flex-shrink-0"
+                        className="h-3 w-3 text-gray-600 mr-2 flex-shrink-0"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -214,7 +214,7 @@ function ExecutionTrace() {
 
                   {/* Expand Icon */}
                   <svg
-                    className={`ml-4 h-5 w-5 text-gray-400 transition-transform ${selectedTrace === index ? 'rotate-180' : ''}`}
+                    className={`ml-4 h-3 w-3 text-gray-400 transition-transform ${selectedTrace === index ? 'rotate-180' : ''}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -272,7 +272,7 @@ function ExecutionTrace() {
         <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <div className="flex">
             <svg
-              className="h-6 w-6 text-blue-500 mr-3 flex-shrink-0"
+              className="h-4 w-4 text-blue-500 mr-3 flex-shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

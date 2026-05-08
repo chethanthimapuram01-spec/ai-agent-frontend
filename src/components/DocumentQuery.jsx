@@ -81,32 +81,32 @@ function DocumentQuery() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">Document Search</h2>
+      <div className="bg-white rounded-lg shadow-lg p-2">
+        <h2 className="text-base font-bold mb-2 text-gray-800">Document Search</h2>
         
         {/* Search Input */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="mb-2">
+          <label className="block text-[10px] font-medium text-gray-700 mb-0.5">
             Ask a question about your uploaded documents
           </label>
-          <div className="flex gap-3">
+          <div className="flex gap-1.5">
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="e.g., What is the main topic of the document?"
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-2 py-1 text-[10px] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
             <button
               onClick={handleSearch}
               disabled={!query.trim() || searching}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium min-w-[120px]"
+              className="px-3 py-1 text-[10px] bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium min-w-[60px]"
             >
               {searching ? (
                 <span className="flex items-center justify-center">
                   <svg
-                    className="animate-spin h-5 w-5"
+                    className="animate-spin h-2 w-2"
                     viewBox="0 0 24 24"
                   >
                     <circle
@@ -137,7 +137,7 @@ function DocumentQuery() {
           <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
             <div className="flex items-start">
               <svg
-                className="h-5 w-5 text-red-500 mr-3 flex-shrink-0 mt-0.5"
+                className="h-2 w-2 text-red-500 mr-2 flex-shrink-0 mt-0.5"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -158,7 +158,7 @@ function DocumentQuery() {
                     onClick={handleRetry}
                     className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium flex items-center"
                   >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-2 h-2 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                     Retry Search
@@ -182,7 +182,7 @@ function DocumentQuery() {
             {results.length === 0 && !searching && !error && (
               <div className="text-center py-12">
                 <svg
-                  className="mx-auto h-12 w-12 text-gray-400"
+                  className="mx-auto h-5 w-5 text-gray-300"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -216,7 +216,7 @@ function DocumentQuery() {
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center">
                           <svg
-                            className="h-5 w-5 text-blue-500 mr-2"
+                            className="h-2 w-2 text-blue-500 mr-1"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -280,7 +280,7 @@ function DocumentQuery() {
           <div className="mt-6 p-6 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex">
               <svg
-                className="h-6 w-6 text-blue-500 mr-3 flex-shrink-0"
+                className="h-3 w-3 text-blue-500 mr-2 flex-shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
