@@ -129,17 +129,17 @@ function ChatUI() {
   return (
     <div className="max-w-5xl mx-auto">
       {/* Modern Header */}
-      <div className="mb-1.5">
-        <h1 className="text-base font-bold text-gray-900 mb-0.5">AI Chat Assistant</h1>
-        <p className="text-[10px] text-gray-600">Have a conversation with your AI agent</p>
+      <div className="mb-4 text-center">
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">AI Chat Assistant</h1>
+        <p className="text-sm text-gray-600">Have a conversation with your AI agent</p>
       </div>
 
       {/* Session Info Bar */}
-      <div className="mb-1.5 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 rounded border border-blue-200 p-1.5">
+      <div className="mb-4 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-3 shadow-md">
         <div className="flex items-center">
           <div className="bg-blue-600 rounded-full p-0.5 mr-1.5">
             <svg
-              className="h-3 w-3 text-white"
+              style={{width: '10px', height: '10px', minWidth: '10px', minHeight: '10px', maxWidth: '10px', maxHeight: '10px'}} className="text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -153,16 +153,16 @@ function ChatUI() {
             </svg>
           </div>
           <div>
-            <span className="text-xs text-gray-500 block">Current Session</span>
+            <span className="text-xs text-gray-500 block font-medium">Current Session</span>
             <span className="font-mono text-xs text-gray-800">{sessionId.slice(0, 20)}...</span>
           </div>
         </div>
         <button
           onClick={handleNewChat}
-          className="px-2 py-0.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white text-[10px] rounded hover:from-green-700 hover:to-emerald-700 transition-all shadow-sm hover:shadow-md flex items-center"
+          className="px-3 py-1.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white text-sm rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all shadow-md hover:shadow-lg flex items-center font-medium"
         >
           <svg
-            className="h-2.5 w-2.5 mr-0.5"
+            style={{width: '10px', height: '10px', minWidth: '10px', minHeight: '10px', maxWidth: '10px', maxHeight: '10px'}} className="mr-0.5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -178,7 +178,7 @@ function ChatUI() {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-lg h-[calc(100vh-12rem)] flex flex-col border border-gray-200">
+      <div className="bg-white rounded-xl shadow-xl h-[calc(100vh-16rem)] flex flex-col border border-gray-200">
         {/* Chat Messages */}
         <div className="flex-1 overflow-y-auto p-2 space-y-1.5 bg-gradient-to-b from-gray-50 to-white">
           {messages.map((message) => (
@@ -187,7 +187,7 @@ function ChatUI() {
               className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}
             >
               <div
-                className={`max-w-[75%] rounded-xl p-2 shadow-sm ${
+                className={`max-w-[75%] rounded-xl p-2 shadow-md ${
                   message.role === 'user'
                     ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white'
                     : 'bg-white text-gray-800 border border-gray-200'
@@ -196,7 +196,7 @@ function ChatUI() {
                 {message.role === 'assistant' && (
                   <div className="flex items-center mb-2">
                     <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-full p-1 mr-2">
-                      <svg className="h-3 w-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <svg style={{width: '10px', height: '10px', minWidth: '10px', minHeight: '10px', maxWidth: '10px', maxHeight: '10px'}} className="text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
                         <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
                       </svg>
@@ -210,10 +210,10 @@ function ChatUI() {
           ))}
           {isLoading && (
             <div className="flex justify-start animate-fadeIn">
-              <div className="bg-white rounded-xl p-2 shadow-sm border border-gray-200">
+              <div className="bg-white rounded-xl p-2 shadow-md border border-gray-200">
                 <div className="flex items-center mb-2">
                   <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-full p-1 mr-2">
-                    <svg className="h-3 w-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <svg style={{width: '10px', height: '10px', minWidth: '10px', minHeight: '10px', maxWidth: '10px', maxHeight: '10px'}} className="text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
                     </svg>
                   </div>
@@ -235,7 +235,7 @@ function ChatUI() {
           {error && (
             <div className="mb-1 p-1.5 bg-red-50 border-l-2 border-red-500 text-red-700 rounded text-[10px]">
               <div className="flex items-start">
-                <svg className="h-3 w-3 text-red-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <svg style={{width: '10px', height: '10px', minWidth: '10px', minHeight: '10px', maxWidth: '10px', maxHeight: '10px'}} className="text-red-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
                 <div className="flex-1">
@@ -246,7 +246,7 @@ function ChatUI() {
                       onClick={handleRetry}
                       className="mt-1 px-2 py-0.5 bg-red-600 text-white rounded hover:bg-red-700 text-xs font-medium flex items-center"
                     >
-                      <svg className="w-2.5 h-2.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg style={{width: '10px', height: '10px', minWidth: '10px', minHeight: '10px', maxWidth: '10px', maxHeight: '10px'}} className="mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                       </svg>
                       Retry
@@ -262,7 +262,7 @@ function ChatUI() {
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Type your message here..."
-              className="flex-1 resize-none border border-gray-300 rounded-lg p-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm text-xs"
+              className="flex-1 resize-none border border-gray-300 rounded-lg p-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-white shadow-md text-xs"
               rows="1"
             />
             <button
@@ -275,7 +275,7 @@ function ChatUI() {
               ) : (
                 <>
                   <span>Send</span>
-                  <svg className="w-3 h-3 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg style={{width: '10px', height: '10px', minWidth: '10px', minHeight: '10px', maxWidth: '10px', maxHeight: '10px'}} className="ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                   </svg>
                 </>
@@ -289,3 +289,6 @@ function ChatUI() {
 }
 
 export default ChatUI
+
+
+

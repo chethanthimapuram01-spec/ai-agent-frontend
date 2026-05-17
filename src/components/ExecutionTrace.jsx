@@ -9,12 +9,12 @@ function ExecutionTrace() {
   const [selectedTrace, setSelectedTrace] = useState(null)
   const [autoRefresh, setAutoRefresh] = useState(false)
 
-  const fetchTraces = async () => {
+  const fetchTraces = async (taskId = null) => {
     setLoading(true)
     setError(null)
 
     try {
-      const response = await axios.get(API_ENDPOINTS.TRACE)
+      const response = await axios.get(API_ENDPOINTS.WORKFLOW_TRACE(taskId))
       
       // Handle different response structures
       const traceData = response.data.traces || response.data.steps || response.data
@@ -41,18 +41,34 @@ function ExecutionTrace() {
 
   const getStatusColor = (status) => {
     if (typeof status === 'boolean') {
-      return status ? 'text-green-600 bg-green-50 border-green-200' : 'text-red-600 bg-red-50 border-red-200'
+      return status ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
     }
     
     const statusLower = String(status).toLowerCase()
     if (statusLower === 'success' || statusLower === 'completed' || statusLower === 'done') {
-      return 'text-green-600 bg-green-50 border-green-200'
+      return 'bg-green-50 border-green-200'
     } else if (statusLower === 'failure' || statusLower === 'failed' || statusLower === 'error') {
-      return 'text-red-600 bg-red-50 border-red-200'
+      return 'bg-red-50 border-red-200'
     } else if (statusLower === 'running' || statusLower === 'in_progress') {
-      return 'text-blue-600 bg-blue-50 border-blue-200'
+      return 'bg-blue-50 border-blue-200'
     }
-    return 'text-gray-600 bg-gray-50 border-gray-200'
+    return 'bg-gray-50 border-gray-200'
+  }
+
+  const getStatusTextColor = (status) => {
+    if (typeof status === 'boolean') {
+      return status ? '#16a34a' : '#ef4444'
+    }
+    
+    const statusLower = String(status).toLowerCase()
+    if (statusLower === 'success' || statusLower === 'completed' || statusLower === 'done') {
+      return '#16a34a'
+    } else if (statusLower === 'failure' || statusLower === 'failed' || statusLower === 'error') {
+      return '#ef4444'
+    } else if (statusLower === 'running' || statusLower === 'in_progress') {
+      return '#4f46e5'
+    }
+    return '#64748b'
   }
 
   const getStatusIcon = (status) => {
@@ -72,31 +88,40 @@ function ExecutionTrace() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="bg-white rounded-lg shadow-lg p-2">
+    <div className="max-w-7xl mx-auto" style={{background: 'linear-gradient(to bottom right, #eef2ff, #f8fafc)', padding: '24px', borderRadius: '12px'}}>
+      <div className="bg-white shadow-md p-6" style={{borderRadius: '12px', border: '1px solid #e0e7ff'}}>
         {/* Header */}
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <h2 className="text-base font-bold text-gray-800">Execution Trace</h2>
-            <p className="text-[10px] text-gray-600 mt-0.5">Step-by-step execution history</p>
+        <div className="flex items-center justify-between mb-6">
+          <div className="text-center flex-1">
+            <h2 className="text-2xl font-bold" style={{color: '#0f172a'}}>Execution Trace</h2>
+            <p className="text-sm mt-1" style={{color: '#64748b'}}>Step-by-step execution history</p>
           </div>
-          <div className="flex items-center space-x-1.5">
+          <div className="flex items-center space-x-3">
             <label className="flex items-center cursor-pointer">
               <input
                 type="checkbox"
                 checked={autoRefresh}
                 onChange={(e) => setAutoRefresh(e.target.checked)}
-                className="mr-0.5"
+                className="mr-2"
+                style={{accentColor: '#4f46e5'}}
               />
-              <span className="text-[10px] text-gray-700">Auto-refresh</span>
+              <span className="text-sm font-medium" style={{color: '#0f172a'}}>Auto-refresh</span>
             </label>
             <button
               onClick={fetchTraces}
               disabled={loading}
-              className="px-2 py-0.5 text-[10px] bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300 transition-colors flex items-center"
+              className="px-4 py-2 text-sm text-white flex items-center font-medium transition-all"
+              style={{
+                background: loading ? '#cbd5e1' : 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                borderRadius: '12px',
+                cursor: loading ? 'not-allowed' : 'pointer'
+              }}
+              onMouseEnter={(e) => { if (!loading) e.target.style.background = 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)' }}
+              onMouseLeave={(e) => { if (!loading) e.target.style.background = 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)' }}
             >
               <svg
-                className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`}
+                style={{width: '14px', height: '14px', minWidth: '14px', minHeight: '14px', maxWidth: '14px', maxHeight: '14px', flexShrink: 0}}
+                className={`mr-2 ${loading ? 'animate-spin' : ''}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -115,10 +140,11 @@ function ExecutionTrace() {
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <div className="flex">
+          <div className="mb-6 p-4" style={{background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '12px'}}>
+            <div className="flex items-center">
               <svg
-                className="h-3 w-3 text-red-400 mr-2"
+                style={{width: '14px', height: '14px', minWidth: '14px', minHeight: '14px', maxWidth: '14px', maxHeight: '14px', flexShrink: 0, color: '#ef4444'}}
+                className="mr-2"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -128,7 +154,7 @@ function ExecutionTrace() {
                   clipRule="evenodd"
                 />
               </svg>
-              <p className="text-sm text-red-800">{error}</p>
+              <p className="text-sm" style={{color: '#0f172a'}}>{error}</p>
             </div>
           </div>
         )}
@@ -136,39 +162,45 @@ function ExecutionTrace() {
         {/* Execution Steps */}
         {loading && traces.length === 0 ? (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin h-5 w-5 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-            <p className="mt-4 text-gray-600">Loading execution traces...</p>
+            <div className="inline-block animate-spin w-3 h-3 border-4 rounded-full" style={{borderColor: '#4f46e5', borderTopColor: 'transparent'}}></div>
+            <p className="mt-4" style={{color: '#64748b'}}>Loading execution traces...</p>
           </div>
         ) : traces.length === 0 ? (
-          <div className="text-center py-12">
-            <svg
-              className="mx-auto h-8 w-8 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-              />
-            </svg>
-            <p className="mt-4 text-gray-600">No execution traces available</p>
-            <p className="text-sm text-gray-500 mt-2">Run an agent task to see execution history</p>
+          <div className="py-8 px-4">
+            <div className="flex items-center justify-center mb-3">
+              <svg
+                style={{width: '14px', height: '14px', minWidth: '14px', minHeight: '14px', maxWidth: '14px', maxHeight: '14px', flexShrink: 0, color: '#64748b'}}
+                className="mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                />
+              </svg>
+              <span className="font-medium" style={{color: '#64748b'}}>No execution traces available</span>
+            </div>
+            <p className="text-sm text-center" style={{color: '#64748b'}}>Run an agent task to see execution history</p>
           </div>
         ) : (
           <div className="space-y-3">
             {traces.map((trace, index) => (
               <div
                 key={index}
-                className="border border-gray-200 rounded-lg hover:border-blue-300 transition-all cursor-pointer"
+                className="cursor-pointer transition-all"
+                style={{border: '1px solid #e0e7ff', borderRadius: '12px'}}
+                onMouseEnter={(e) => e.currentTarget.style.borderColor = '#4f46e5'}
+                onMouseLeave={(e) => e.currentTarget.style.borderColor = '#e0e7ff'}
                 onClick={() => setSelectedTrace(selectedTrace === index ? null : index)}
               >
                 {/* Step Header */}
-                <div className="flex items-center p-4 bg-gray-50">
+                <div className="flex items-center p-4" style={{background: 'linear-gradient(to bottom right, #eef2ff, #f8fafc)', borderRadius: '12px 12px 0 0'}}>
                   {/* Step Number */}
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-base mr-4">
+                  <div className="flex-shrink-0 w-3 h-3 text-white rounded-full flex items-center justify-center font-bold text-xs mr-3" style={{background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)'}}>
                     {trace.step || trace.step_number || index + 1}
                   </div>
 
@@ -176,7 +208,8 @@ function ExecutionTrace() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center">
                       <svg
-                        className="h-3 w-3 text-gray-600 mr-2 flex-shrink-0"
+                        style={{width: '14px', height: '14px', minWidth: '14px', minHeight: '14px', maxWidth: '14px', maxHeight: '14px', flexShrink: 0, color: '#64748b'}}
+                        className="mr-2"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -194,17 +227,17 @@ function ExecutionTrace() {
                           d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
                         />
                       </svg>
-                      <h3 className="font-semibold text-gray-900 truncate">
+                      <h3 className="font-semibold truncate" style={{color: '#0f172a'}}>
                         {trace.tool || trace.action || trace.name || 'Unknown Tool'}
                       </h3>
                     </div>
                     {trace.description && (
-                      <p className="text-sm text-gray-600 mt-1 truncate">{trace.description}</p>
+                      <p className="text-sm mt-1 truncate" style={{color: '#64748b'}}>{trace.description}</p>
                     )}
                   </div>
 
                   {/* Status Badge */}
-                  <div className={`ml-4 px-4 py-2 rounded-full border-2 font-semibold text-sm ${getStatusColor(trace.status || trace.success)}`}>
+                  <div className={`ml-4 px-4 py-2 border-2 font-semibold text-sm ${getStatusColor(trace.status || trace.success)}`} style={{borderRadius: '12px', color: getStatusTextColor(trace.status || trace.success)}}>
                     <span className="mr-1">{getStatusIcon(trace.status || trace.success)}</span>
                     {typeof trace.status === 'boolean' 
                       ? (trace.status ? 'Success' : 'Failed')
@@ -214,7 +247,8 @@ function ExecutionTrace() {
 
                   {/* Expand Icon */}
                   <svg
-                    className={`ml-4 h-3 w-3 text-gray-400 transition-transform ${selectedTrace === index ? 'rotate-180' : ''}`}
+                    style={{width: '14px', height: '14px', minWidth: '14px', minHeight: '14px', maxWidth: '14px', maxHeight: '14px', flexShrink: 0, color: '#64748b'}}
+                    className={`ml-4 transition-transform ${selectedTrace === index ? 'rotate-180' : ''}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -230,10 +264,10 @@ function ExecutionTrace() {
 
                 {/* Expanded Details */}
                 {selectedTrace === index && (
-                  <div className="p-4 border-t border-gray-200 bg-white">
-                    <h4 className="font-semibold text-gray-800 mb-2">Result:</h4>
-                    <div className="bg-gray-50 rounded p-3 border border-gray-200">
-                      <pre className="text-sm text-gray-800 whitespace-pre-wrap font-mono">
+                  <div className="p-4 bg-white" style={{borderTop: '1px solid #e0e7ff'}}>
+                    <h4 className="font-semibold mb-2" style={{color: '#0f172a'}}>Result:</h4>
+                    <div className="p-3" style={{background: 'linear-gradient(to bottom right, #eef2ff, #f8fafc)', border: '1px solid #e0e7ff', borderRadius: '8px'}}>
+                      <pre className="text-sm whitespace-pre-wrap font-mono" style={{color: '#475569'}}>
                         {trace.result || trace.output || trace.message || 'No result available'}
                       </pre>
                     </div>
@@ -243,20 +277,20 @@ function ExecutionTrace() {
                       <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                         {trace.timestamp && (
                           <div>
-                            <span className="text-xs font-semibold text-gray-600">Timestamp:</span>
-                            <p className="text-sm text-gray-800">{new Date(trace.timestamp).toLocaleString()}</p>
+                            <span className="text-xs font-semibold" style={{color: '#64748b'}}>Timestamp:</span>
+                            <p className="text-sm" style={{color: '#0f172a'}}>{new Date(trace.timestamp).toLocaleString()}</p>
                           </div>
                         )}
                         {trace.duration && (
                           <div>
-                            <span className="text-xs font-semibold text-gray-600">Duration:</span>
-                            <p className="text-sm text-gray-800">{trace.duration}ms</p>
+                            <span className="text-xs font-semibold" style={{color: '#64748b'}}>Duration:</span>
+                            <p className="text-sm" style={{color: '#0f172a'}}>{trace.duration}ms</p>
                           </div>
                         )}
                         {trace.input && (
                           <div>
-                            <span className="text-xs font-semibold text-gray-600">Input:</span>
-                            <p className="text-sm text-gray-800 truncate">{String(trace.input)}</p>
+                            <span className="text-xs font-semibold" style={{color: '#64748b'}}>Input:</span>
+                            <p className="text-sm truncate" style={{color: '#0f172a'}}>{String(trace.input)}</p>
                           </div>
                         )}
                       </div>
@@ -269,10 +303,11 @@ function ExecutionTrace() {
         )}
 
         {/* Info Panel */}
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="mt-6 p-4" style={{background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '12px'}}>
           <div className="flex">
             <svg
-              className="h-4 w-4 text-blue-500 mr-3 flex-shrink-0"
+              style={{width: '14px', height: '14px', minWidth: '14px', minHeight: '14px', maxWidth: '14px', maxHeight: '14px', flexShrink: 0, color: '#4f46e5'}}
+              className="mr-3"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -285,8 +320,8 @@ function ExecutionTrace() {
               />
             </svg>
             <div>
-              <h4 className="text-sm font-semibold text-blue-900 mb-1">Execution Trace Features</h4>
-              <ul className="text-sm text-blue-800 space-y-1">
+              <h4 className="text-sm font-semibold mb-1" style={{color: '#0f172a'}}>Execution Trace Features</h4>
+              <ul className="text-sm space-y-1" style={{color: '#64748b'}}>
                 <li>• View step-by-step execution history of agent tasks</li>
                 <li>• Click on any step to see detailed results and metadata</li>
                 <li>• Green = Success, Red = Failure, Blue = In Progress</li>
@@ -301,3 +336,6 @@ function ExecutionTrace() {
 }
 
 export default ExecutionTrace
+
+
+

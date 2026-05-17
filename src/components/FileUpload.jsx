@@ -56,7 +56,7 @@ function FileUpload() {
     setCanRetry(false)
 
     try {
-      const response = await axios.post(API_ENDPOINTS.UPLOAD, formData, {
+      const response = await axios.post(API_ENDPOINTS.UPLOAD_DOC, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -136,37 +136,58 @@ function FileUpload() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-lg shadow-lg p-2">
-        <h2 className="text-base font-bold mb-2 text-gray-800">File Upload</h2>
+    <div className="min-h-screen p-8" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
+      <div className="max-w-4xl mx-auto">
+        <div className="p-8" style={{
+          background: 'rgba(255,255,255,0.15)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255,255,255,0.2)',
+          borderRadius: '24px',
+          boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+        }}>
+          <div className="mb-8 text-center">
+            <h2 className="text-3xl font-bold mb-3 flex items-center justify-center" style={{color: '#ffffff'}}>
+              <svg style={{width: '10px', height: '10px', minWidth: '10px', minHeight: '10px', maxWidth: '10px', maxHeight: '10px', color: '#ffffff'}} className="mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              File Upload
+            </h2>
+            <p className="text-base" style={{color: 'rgba(255,255,255,0.9)'}}>Upload your documents for processing</p>
+          </div>
         
-        {/* Drop Zone */}
-        <div
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-          className="border-2 border-dashed border-gray-300 rounded p-2 text-center hover:border-blue-500 transition-colors cursor-pointer"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <svg
-            className="mx-auto h-8 w-8 text-gray-400"
-            stroke="currentColor"
-            fill="none"
-            viewBox="0 0 48 48"
-            aria-hidden="true"
+          {/* Drop Zone */}
+          <div
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            className="p-12 text-center cursor-pointer transition-all duration-200"
+            style={{
+              border: '2px dashed rgba(255,255,255,0.4)',
+              borderRadius: '20px',
+              background: 'rgba(255,255,255,0.1)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.8)'
+              e.currentTarget.style.background = 'rgba(255,255,255,0.2)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'
+              e.currentTarget.style.background = 'rgba(255,255,255,0.1)'
+            }}
+            onClick={() => fileInputRef.current?.click()}
           >
-            <path
-              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <p className="mt-2 text-sm text-gray-600">
-            <span className="font-semibold text-blue-600">Click to upload</span> or drag and drop
-          </p>
-          <p className="text-xs text-gray-500 mt-1">
-            PDF, TXT, DOCX, or other document files
-          </p>
+            <div className="flex flex-col items-center justify-center">
+              <p className="text-base font-medium mb-3 flex items-center" style={{color: '#ffffff'}}>
+                <svg style={{width: '10px', height: '10px', minWidth: '10px', minHeight: '10px', maxWidth: '10px', maxHeight: '10px', color: '#ffffff'}} className="mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <span className="font-bold">Click to upload</span>
+                <span>&nbsp;or drag and drop</span>
+              </p>
+              <p className="text-sm" style={{color: 'rgba(255,255,255,0.8)'}}>
+                PDF, TXT, DOC, or DOCX files (Max 10MB)
+              </p>
+            </div>
           <input
             ref={fileInputRef}
             type="file"
@@ -176,61 +197,80 @@ function FileUpload() {
           />
         </div>
 
-        {/* Selected File Display */}
-        {selectedFile && (
-          <div className="mt-1.5 p-1.5 bg-gray-50 rounded flex items-center justify-between">
-            <div className="flex items-center">
-              <svg
-                className="h-3 w-3 text-blue-500 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-              <div>
-                <p className="text-sm font-medium text-gray-900">{selectedFile.name}</p>
-                <p className="text-xs text-gray-500">
-                  {(selectedFile.size / 1024).toFixed(2)} KB
-                </p>
+          {/* Selected File Display */}
+          {selectedFile && (
+            <div className="mt-6 p-5 flex items-center justify-between" style={{
+              background: 'rgba(255,255,255,0.2)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '16px'
+            }}>
+              <div className="flex items-center">
+                <div className="p-2 mr-3" style={{background: 'rgba(255,255,255,0.25)', borderRadius: '12px'}}>
+                  <svg
+                    style={{width: '10px', height: '10px', minWidth: '10px', minHeight: '10px', maxWidth: '10px', maxHeight: '10px', color: '#ffffff'}}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold" style={{color: '#ffffff'}}>{selectedFile.name}</p>
+                  <p className="text-xs mt-0.5" style={{color: 'rgba(255,255,255,0.8)'}}>
+                    {(selectedFile.size / 1024).toFixed(2)} KB
+                  </p>
+                </div>
               </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setSelectedFile(null)
+                  if (fileInputRef.current) {
+                    fileInputRef.current.value = ''
+                  }
+                }}
+                className="rounded-full p-2 transition-all"
+                style={{color: '#ff4444'}}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,68,68,0.2)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                title="Remove file"
+              >
+                <svg style={{width: '10px', height: '10px', minWidth: '10px', minHeight: '10px', maxWidth: '10px', maxHeight: '10px'}} fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
             </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                setSelectedFile(null)
-                if (fileInputRef.current) {
-                  fileInputRef.current.value = ''
-                }
-              }}
-              className="text-red-500 hover:text-red-700"
-            >
-              <svg className="h-2 w-2" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          </div>
-        )}
+          )}
 
-        {/* Upload Button */}
-        <button
-          onClick={handleUpload}
-          disabled={!selectedFile || uploading}
-          className="mt-1.5 w-full px-3 py-1 text-[10px] bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium"
-        >
+          {/* Upload Button */}
+          <button
+            onClick={handleUpload}
+            disabled={!selectedFile || uploading}
+            className="mt-6 w-full px-8 py-4 text-base font-bold text-white transition-all flex items-center justify-center"
+            style={{
+              background: (!selectedFile || uploading) ? 'rgba(255,255,255,0.2)' : 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+              borderRadius: '9999px',
+              cursor: (!selectedFile || uploading) ? 'not-allowed' : 'pointer',
+              boxShadow: (!selectedFile || uploading) ? 'none' : '0 4px 15px 0 rgba(245, 87, 108, 0.5)'
+            }}
+            onMouseEnter={(e) => { if (selectedFile && !uploading) e.target.style.boxShadow = '0 6px 20px 0 rgba(245, 87, 108, 0.7)' }}
+            onMouseLeave={(e) => { if (selectedFile && !uploading) e.target.style.boxShadow = '0 4px 15px 0 rgba(245, 87, 108, 0.5)' }}
+          >
           {uploading ? (
-            <span className="flex items-center justify-center">
+            <span className="flex items-center">
               <svg
-                className="animate-spin h-2 w-2 mr-2"
+                style={{width: '10px', height: '10px', minWidth: '10px', minHeight: '10px', maxWidth: '10px', maxHeight: '10px'}} className="animate-spin mr-2"
                 viewBox="0 0 24 24"
               >
                 <circle
@@ -251,45 +291,64 @@ function FileUpload() {
               Uploading...
             </span>
           ) : (
-            'Upload File'
+            <>
+              <svg style={{width: '10px', height: '10px', minWidth: '10px', minHeight: '10px', maxWidth: '10px', maxHeight: '10px'}} className="mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              Upload File
+            </>
           )}
         </button>
 
-        {/* Error Message */}
-        {error && (
-          <div className="mt-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
-            <div className="flex items-start">
-              <svg
-                className="h-2 w-2 text-red-500 mr-2 flex-shrink-0 mt-0.5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <div className="flex-1">
-                <h4 className="text-sm font-semibold text-red-800 mb-1">Upload Failed</h4>
-                <p className="text-sm text-red-700">{error}</p>
-                {retryCount > 0 && retryCount < 3 && (
-                  <p className="text-xs text-red-600 mt-1">Retry attempt {retryCount} of 3</p>
-                )}
-                {canRetry && retryCount < 3 && (
-                  <button
-                    onClick={handleRetry}
-                    className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium flex items-center"
+          {/* Error Message */}
+          {error && (
+            <div className="mt-6 p-5" style={{
+              background: 'rgba(255,68,68,0.15)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,68,68,0.3)',
+              borderRadius: '16px'
+            }}>
+              <div className="flex items-start">
+                <div className="p-2 mr-3 flex-shrink-0" style={{background: '#ff4444', borderRadius: '12px'}}>
+                  <svg
+                    style={{width: '10px', height: '10px', minWidth: '10px', minHeight: '10px', maxWidth: '10px', maxHeight: '10px', color: '#ffffff'}}
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
                   >
-                    <svg className="w-2 h-2 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-bold mb-1" style={{color: '#ffffff'}}>Upload Failed</h4>
+                  <p className="text-sm" style={{color: 'rgba(255,255,255,0.9)'}}>{error}</p>
+                  {retryCount > 0 && retryCount < 3 && (
+                    <p className="text-xs mt-1" style={{color: '#ff4444'}}>Retry attempt {retryCount} of 3</p>
+                  )}
+                  {canRetry && retryCount < 3 && (
+                    <button
+                      onClick={handleRetry}
+                      className="mt-3 px-5 py-2 text-white text-sm font-bold flex items-center transition-all"
+                      style={{
+                        background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                        borderRadius: '9999px',
+                        boxShadow: '0 4px 15px 0 rgba(245, 87, 108, 0.5)'
+                      }}
+                      onMouseEnter={(e) => e.target.style.boxShadow = '0 6px 20px 0 rgba(245, 87, 108, 0.7)'}
+                      onMouseLeave={(e) => e.target.style.boxShadow = '0 4px 15px 0 rgba(245, 87, 108, 0.5)'}
+                    >
+                    <svg style={{width: '10px', height: '10px', minWidth: '10px', minHeight: '10px', maxWidth: '10px', maxHeight: '10px'}} className="mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                     Retry Upload
                   </button>
                 )}
-                {retryCount >= 3 && (
-                  <div className="mt-3 p-3 bg-red-100 rounded border border-red-300">
-                    <p className="text-xs text-red-800">
+                  {retryCount >= 3 && (
+                    <div className="mt-3 p-3" style={{background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '12px'}}>
+                      <p className="text-xs" style={{color: '#ffffff'}}>
                       <strong>Troubleshooting tips:</strong><br/>
                       • Check your internet connection<br/>
                       • Ensure the file is not corrupted<br/>
@@ -303,43 +362,59 @@ function FileUpload() {
           </div>
         )}
 
-        {/* Success Message */}
-        {uploadSuccess && (
-          <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <div className="flex">
-              <svg
-                className="h-2 w-2 text-green-400 mr-1"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-green-800">Upload Successful!</p>
-                <p className="text-sm text-green-700 mt-1">
-                  File: <span className="font-semibold">{uploadedFileName}</span>
-                </p>
+          {/* Success Message */}
+          {uploadSuccess && (
+            <div className="mt-6 p-5" style={{
+              background: 'rgba(67,233,123,0.15)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(67,233,123,0.3)',
+              borderRadius: '16px'
+            }}>
+              <div className="flex items-center">
+                <div className="p-2 mr-3 flex-shrink-0" style={{background: '#43e97b', borderRadius: '12px'}}>
+                  <svg
+                    style={{width: '10px', height: '10px', minWidth: '10px', minHeight: '10px', maxWidth: '10px', maxHeight: '10px', color: '#ffffff'}}
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold" style={{color: '#ffffff'}}>Upload Successful!</p>
+                  <p className="text-sm mt-1" style={{color: 'rgba(255,255,255,0.9)'}}>
+                    File: <span className="font-semibold">{uploadedFileName}</span>
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Extracted Text Display */}
-        {extractedText && (
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Extracted Text:</h3>
-            <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg max-h-64 overflow-y-auto">
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">{extractedText}</p>
+          {/* Extracted Text Display */}
+          {extractedText && (
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold mb-3" style={{color: '#ffffff'}}>Extracted Text:</h3>
+              <div className="p-5 max-h-64 overflow-y-auto" style={{
+                background: 'rgba(255,255,255,0.15)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: '16px'
+              }}>
+                <p className="text-sm whitespace-pre-wrap" style={{color: 'rgba(255,255,255,0.95)'}}>{extractedText}</p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )
 }
 
 export default FileUpload
+
+
+
